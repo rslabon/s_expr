@@ -1,8 +1,8 @@
 package eval;
 
 import org.junit.jupiter.api.Test;
+import parser.Deferred;
 import parser.LongNumber;
-import parser.SExpr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,15 +35,27 @@ class EvalTest {
         assertEquals(123L, actual.get("x"));
     }
 
-//    @Test
-//    public void function() {
-//        LazyEnv env = new LazyEnv(null);
-//        env.set("inc", new SExpr());
-//
-//        String code = "(define (inc x) (+ x 1))\n";
-//
-//        Env actual = new Eval().eval("(do (inc 1))", env);
-//
-//        assertEquals(123L, actual.get("x"));
-//    }
+    @Test
+    public void lambda() {
+        LazyEnv env = new LazyEnv(null);
+
+        Env actual = new Eval().eval("(define l (lambda(x) x))", env);
+
+        Deferred value = (Deferred) actual.get("l");
+        LazyEnv lambdaEnv = new LazyEnv(null);
+        lambdaEnv.set("x", new LongNumber(999));
+        assertEquals(999L, value.eval(lambdaEnv));
+    }
+
+    @Test
+    public void lambdaWithContextReference() {
+        LazyEnv env = new LazyEnv(null);
+        env.set("y", new LongNumber(54));
+
+        Env actual = new Eval().eval("(define l (lambda(x) y))", env);
+
+        Deferred value = (Deferred) actual.get("l");
+        LazyEnv lambdaEnv = new LazyEnv(null);
+        assertEquals(54L, value.eval(lambdaEnv));
+    }
 }

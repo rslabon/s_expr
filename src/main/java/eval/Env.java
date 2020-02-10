@@ -8,4 +8,6 @@ public interface Env {
     Object get(String name);
 
     void set(String varName, Expression value);
+
+    Env chain(Env context);
 }

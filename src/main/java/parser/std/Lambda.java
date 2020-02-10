@@ -1,50 +1,30 @@
-package parser;
+package parser.std;
 
 import eval.Env;
+import parser.Deferred;
+import parser.Expression;
+import parser.SExpr;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-public class Lambda extends Expression {
-    private final List<String> arguments;
-    private final SExpr body;
+public class Lambda extends StdFunction {
 
-    public Lambda(SExpr body, List<String> arguments) {
-        this.arguments = arguments;
-        this.body = body;
-    }
+    public static final String LAMBDA = "lambda";
 
-    public Lambda(SExpr body, String... arguments) {
-        this.arguments = Arrays.asList(arguments);
-        this.body = body;
-    }
-
-    public Lambda(SExpr body) {
-        this(body, Collections.emptyList());
+    public Lambda() {
+        super(LAMBDA, 2);
     }
 
     @Override
-    public Object eval(Env env) {
-        if (arguments.isEmpty()) {
-            return body.eval(env);
+    public Object doInvoke(Env env, List<Expression> parameters) {
+        Expression lambdaArgs = parameters.get(0);
+        if (!(lambdaArgs instanceof SExpr)) {
+            throw new IllegalArgumentException("Invalid lambda arguments! Proper use: (lambda (a b) (+ a b))");
         }
-        return null;
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        Expression body = parameters.get(1);
 
-        Lambda lambda = (Lambda) o;
-
-        return arguments != null ? arguments.equals(lambda.arguments) : lambda.arguments == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return arguments != null ? arguments.hashCode() : 0;
+        return new Deferred(env, body);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package parser;
 
 import eval.Env;
+import parser.std.StdFunction;
+import parser.std.StdFunctions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +32,20 @@ public class SExpr extends Expression {
 
     @Override
     public Object eval(Env env) {
+
+        if (!expressions.isEmpty()) {
+            Expression first = expressions.get(0);
+            if (first instanceof Var) {
+                String varName = ((Var) first).getName();
+                StdFunction function = StdFunctions.function.get(varName.toLowerCase());
+                if (function != null) {
+                    return function.invoke(env, expressions.subList(1, expressions.size()));
+                } else {
+                    throw new IllegalArgumentException("Unknown reference: " + varName);
+                }
+            }
+        }
+
         return null;
     }
 

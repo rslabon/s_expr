@@ -1,7 +1,6 @@
 package parser;
 
 import eval.Env;
-import eval.LazyEnv;
 
 public class Deferred extends Expression {
 
@@ -15,6 +14,6 @@ public class Deferred extends Expression {
 
     @Override
     public Object eval(Env env) {
-        return body.eval(LazyEnv.merge(env, context));
+        return body.eval(env.chain(context));
     }
 }
