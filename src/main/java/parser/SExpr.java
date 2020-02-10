@@ -1,3 +1,7 @@
+package parser;
+
+import eval.Env;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +29,11 @@ public class SExpr extends Expression {
     }
 
     @Override
+    public Object eval(Env env) {
+        return null;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -41,7 +50,7 @@ public class SExpr extends Expression {
 
     @Override
     public String toString() {
-        return "SExpr{" +
+        return "parser.SExpr{" +
                 "expressions=" + expressions +
                 '}';
     }

@@ -1,8 +1,17 @@
+package parser;
+
+import eval.Env;
+
 public class Quote extends Expression {
     private final String text;
 
     public Quote(String text) {
         this.text = text;
+    }
+
+    @Override
+    public Object eval(Env env) {
+        return text;
     }
 
     public String getText() {
@@ -26,7 +35,7 @@ public class Quote extends Expression {
 
     @Override
     public String toString() {
-        return "Quote{" +
+        return "parser.Quote{" +
                 "text='" + text + '\'' +
                 '}';
     }

@@ -1,8 +1,11 @@
+package parser;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ParserTest {
+
     @Test
     public void number() throws Exception {
         assertParse(new DoubleNumber(1.98), "1.98");
@@ -47,6 +50,6 @@ class ParserTest {
     }
 
     private void assertParse(Expression expected, String text) {
-        assertEquals(expected, Parser.parse(text));
+        assertEquals(expected, new DefaultParser().parse(text));
     }
 }

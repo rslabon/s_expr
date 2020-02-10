@@ -1,17 +1,20 @@
+package parser;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-public class Parser {
+public class DefaultParser implements Parser {
 
-    public static Expression parse(String text) {
-        CharTokenizer tokenizer = new CharTokenizer(text);
+    @Override
+    public Expression parse(String text) {
+        SExpressionTokenizer tokenizer = new SExpressionTokenizer(text);
         return parse(tokenizer.iterator()).get(0);
     }
 
-    public static List<Expression> parse(Iterator<String> tokens) {
+    public List<Expression> parse(Iterator<String> tokens) {
         List<Expression> result = new ArrayList<>();
         while (tokens.hasNext()) {
             String token = tokens.next();
@@ -27,14 +30,14 @@ public class Parser {
         return result;
     }
 
-    private static class CharTokenizer implements Iterable<String> {
+    static class SExpressionTokenizer implements Iterable<String> {
         private static final int NO_QUOTE = 0;
         private static final int QUOTE_END = 2;
         static final char QUOTE_CHAR = '\'';
 
         private final String text;
 
-        public CharTokenizer(String text) {
+        public SExpressionTokenizer(String text) {
             this.text = text.trim();
         }
 
@@ -55,7 +58,10 @@ public class Parser {
                     while (index < text.length()) {
                         char c = text.charAt(index++);
                         if (token.length() == 0 && c == ' ') {
-                            continue;
+                            continue;//skip whitespaces at the beginning
+                        }
+                        if (c == '\n') {
+                            continue;//skip new lines
                         }
                         if (c == QUOTE_CHAR) {
                             quote++;
@@ -65,7 +71,7 @@ public class Parser {
                                 if (token.length() == 0) {
                                     return String.valueOf(c);
                                 } else /* "xxx(" or "xxx)" or "xxx " */ {
-                                    index--;
+                                    index--;//backtrack one char leave only "xxx"
                                 }
                                 return token;
                             }
@@ -107,9 +113,9 @@ public class Parser {
                     return new Bool(false);
                 }
 
-                if (token.charAt(0) == CharTokenizer.QUOTE_CHAR) {
+                if (token.charAt(0) == SExpressionTokenizer.QUOTE_CHAR) {
                     token = token.substring(1);
-                    if (token.charAt(token.length() - 1) == CharTokenizer.QUOTE_CHAR) {
+                    if (token.charAt(token.length() - 1) == SExpressionTokenizer.QUOTE_CHAR) {
                         token = token.substring(0, token.length() - 1);
                     }
                     return new Quote(token);

@@ -1,5 +1,10 @@
+package parser;
+
+import eval.Env;
+
 public class Var extends Expression {
     private final String name;
+
 
     public Var(String name) {
         this.name = name;
@@ -7,6 +12,11 @@ public class Var extends Expression {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Object eval(Env env) {
+        return env.get(name);
     }
 
     @Override
@@ -26,7 +36,7 @@ public class Var extends Expression {
 
     @Override
     public String toString() {
-        return "Var{" +
+        return "parser.Var{" +
                 "name='" + name + '\'' +
                 '}';
     }
