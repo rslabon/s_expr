@@ -2,11 +2,14 @@ package parser;
 
 import eval.Env;
 
+import java.util.List;
+
 public class DoubleNumber extends Expression {
     private final double value;
 
     public DoubleNumber(double v) {
         value = v;
+        functions.put("+", this::add);
     }
 
     @Override
@@ -35,5 +38,22 @@ public class DoubleNumber extends Expression {
         return "parser.DoubleNumber{" +
                 "value=" + value +
                 '}';
+    }
+
+    private Object add(Env env, List<Expression> argValues) {
+        double sum = 0.0;
+        for (Expression argValue : argValues) {
+            Object evalArgValue = argValue.eval(env);
+            if (evalArgValue instanceof Long) {
+                sum += ((Long) evalArgValue).doubleValue();
+            }
+            if (evalArgValue instanceof Double) {
+                sum += ((double) evalArgValue);
+            }
+            if (evalArgValue instanceof String) {
+                sum += Double.parseDouble((String) evalArgValue);
+            }
+        }
+        return sum;
     }
 }

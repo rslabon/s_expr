@@ -1,11 +1,11 @@
-package parser.std;
+package parser;
 
 import eval.Env;
 import eval.Eval;
 import eval.LazyEnv;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AddTest {
 

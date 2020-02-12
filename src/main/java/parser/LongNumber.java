@@ -2,11 +2,15 @@ package parser;
 
 import eval.Env;
 
+import java.util.List;
+
 public class LongNumber extends Expression {
+
     private final long value;
 
     public LongNumber(long v) {
         value = v;
+        functions.put("+", this::add);
     }
 
     @Override
@@ -34,5 +38,22 @@ public class LongNumber extends Expression {
         return "parser.LongNumber{" +
                 "value=" + value +
                 '}';
+    }
+
+    private Object add(Env env, List<Expression> argValues) {
+        long sum = 0;
+        for (Expression argValue : argValues) {
+            Object evalArgValue = argValue.eval(env);
+            if (evalArgValue instanceof Long) {
+                sum += (long) evalArgValue;
+            }
+            if (evalArgValue instanceof Double) {
+                sum += ((Double) evalArgValue).longValue();
+            }
+            if (evalArgValue instanceof String) {
+                sum += Long.parseLong((String) evalArgValue);
+            }
+        }
+        return sum;
     }
 }
