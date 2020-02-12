@@ -1,4 +1,4 @@
-package parser.std;
+package parser.specialform;
 
 import eval.Env;
 import parser.Expression;
@@ -6,7 +6,7 @@ import parser.Var;
 
 import java.util.List;
 
-public class Define extends StdFunction {
+public class Define extends SpecialForm {
 
     public static final String DEFINE = "define";
 

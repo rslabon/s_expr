@@ -1,13 +1,15 @@
-package parser.std;
+package parser.specialform;
 
 import eval.Env;
 import parser.Deferred;
 import parser.Expression;
 import parser.SExpr;
+import parser.Var;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class Lambda extends StdFunction {
+public class Lambda extends SpecialForm {
 
     public static final String LAMBDA = "lambda";
 
@@ -22,9 +24,16 @@ public class Lambda extends StdFunction {
             throw new IllegalArgumentException("Invalid lambda arguments! Proper use: (lambda (a b) (+ a b))");
         }
 
+        List<String> args = ((SExpr) lambdaArgs).getExpressions()
+                .stream()
+                .filter(expr -> expr instanceof Var)
+                .map(expr -> ((Var)expr))
+                .map(Var::getName)
+                .collect(Collectors.toList());
+
         Expression body = parameters.get(1);
 
-        return new Deferred(env, body);
+        return new Deferred(env, args, body);
     }
 
     @Override

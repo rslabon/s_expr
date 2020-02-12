@@ -1,8 +1,9 @@
 package parser;
 
 import eval.Env;
-import parser.std.StdFunction;
-import parser.std.StdFunctions;
+import eval.LazyEnv;
+import parser.specialform.SpecialForm;
+import parser.specialform.SpecialForms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,10 +38,28 @@ public class SExpr extends Expression {
             Expression first = expressions.get(0);
             if (first instanceof Var) {
                 String varName = ((Var) first).getName();
-                StdFunction function = StdFunctions.function.get(varName.toLowerCase());
-                if (function != null) {
-                    return function.invoke(env, expressions.subList(1, expressions.size()));
+                SpecialForm specialForm = SpecialForms.INSTANCE.get(varName.toLowerCase());
+                if (specialForm != null) {
+                    return specialForm.invoke(env, expressions.subList(1, expressions.size()));
                 } else {
+                    Object function = env.get(varName);
+                    if (function instanceof Deferred) {
+                        Deferred deferred = (Deferred) function;
+                        List<String> argNames = deferred.getArgs();
+                        List<Expression> argValues = this.expressions.subList(1, this.expressions.size());
+
+                        if (argNames.size() != argValues.size()) {
+                            throw new IllegalArgumentException("Invalid number of arguments for: " + varName
+                                    + ". Actual: " + argValues.size() + " but expected: " + argNames.size());
+                        }
+
+                        LazyEnv deferredArgsEnv = new LazyEnv(null);
+                        for (int i = 0; i < argValues.size(); i++) {
+                            deferredArgsEnv.set(argNames.get(i), argValues.get(i));
+                        }
+
+                        return deferred.eval(deferredArgsEnv);
+                    }
                     throw new IllegalArgumentException("Unknown reference: " + varName);
                 }
             }

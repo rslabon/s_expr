@@ -1,15 +1,15 @@
-package parser.std;
+package parser.specialform;
 
 import eval.Env;
 import parser.Expression;
 
 import java.util.List;
 
-public abstract class StdFunction {
+public abstract class SpecialForm {
     final String name;
     final int arguments;
 
-    public StdFunction(String name, int arguments) {
+    public SpecialForm(String name, int arguments) {
         this.name = name;
         this.arguments = arguments;
     }

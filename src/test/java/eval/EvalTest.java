@@ -1,11 +1,11 @@
 package eval;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import parser.Deferred;
 import parser.LongNumber;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class EvalTest {
 
@@ -57,5 +57,60 @@ class EvalTest {
         Deferred value = (Deferred) actual.get("l");
         LazyEnv lambdaEnv = new LazyEnv(null);
         assertEquals(54L, value.eval(lambdaEnv));
+    }
+
+    @Test
+    public void invokeLambda() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "" +
+                "(define self (lambda(x) x))\n"+
+                "(define result (self 23))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(23L, actual.get("result"));
+    }
+
+    @Test
+    public void manyExpressions() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "" +
+                "(define a 1)\n" +
+                "(define b 2)";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(1L, actual.get("a"));
+        assertEquals(2L, actual.get("b"));
+    }
+
+    @Test
+    public void manyExpressionsWithReference() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "" +
+                "(define a 7865)\n" +
+                "(define b a)";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(7865L, actual.get("a"));
+        assertEquals(7865L, actual.get("b"));
+    }
+
+    @Test
+    public void invalidReference() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "(define a b)";
+
+        Executable exec = () -> {
+            Env actual = new Eval().eval(code, env);
+            actual.get("a");
+        };
+
+        assertThrows(IllegalArgumentException.class, exec, "Unbound variable: b");
     }
 }
