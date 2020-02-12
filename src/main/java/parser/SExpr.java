@@ -4,6 +4,8 @@ import eval.Env;
 import eval.LazyEnv;
 import parser.specialform.SpecialForm;
 import parser.specialform.SpecialForms;
+import parser.std.StdFunction;
+import parser.std.StdFunctions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,28 +39,22 @@ public class SExpr extends Expression {
         if (!expressions.isEmpty()) {
             Expression first = expressions.get(0);
             if (first instanceof Var) {
+
                 String varName = ((Var) first).getName();
                 SpecialForm specialForm = SpecialForms.INSTANCE.get(varName.toLowerCase());
+                List<Expression> argValues = expressions.subList(1, expressions.size());
+
                 if (specialForm != null) {
-                    return specialForm.invoke(env, expressions.subList(1, expressions.size()));
+                    return specialForm.invoke(env, argValues);
                 } else {
+                    StdFunction stdFunction = StdFunctions.INSTANCE.get(varName);
+                    if (stdFunction != null) {
+                        return stdFunction.invoke(env, argValues);
+                    }
+
                     Object function = env.get(varName);
                     if (function instanceof Deferred) {
-                        Deferred deferred = (Deferred) function;
-                        List<String> argNames = deferred.getArgs();
-                        List<Expression> argValues = this.expressions.subList(1, this.expressions.size());
-
-                        if (argNames.size() != argValues.size()) {
-                            throw new IllegalArgumentException("Invalid number of arguments for: " + varName
-                                    + ". Actual: " + argValues.size() + " but expected: " + argNames.size());
-                        }
-
-                        LazyEnv deferredArgsEnv = new LazyEnv(null);
-                        for (int i = 0; i < argValues.size(); i++) {
-                            deferredArgsEnv.set(argNames.get(i), argValues.get(i));
-                        }
-
-                        return deferred.eval(deferredArgsEnv);
+                        return invokeDeferred(varName, (Deferred) function, argValues);
                     }
                     throw new IllegalArgumentException("Unknown reference: " + varName);
                 }
@@ -66,6 +62,22 @@ public class SExpr extends Expression {
         }
 
         return null;
+    }
+
+    private Object invokeDeferred(String varName, Deferred deferred, List<Expression> argValues) {
+        List<String> argNames = deferred.getArgs();
+
+        if (argNames.size() != argValues.size()) {
+            throw new IllegalArgumentException("Invalid number of arguments for: " + varName
+                    + ". Actual: " + argValues.size() + " but expected: " + argNames.size());
+        }
+
+        LazyEnv deferredArgsEnv = new LazyEnv(null);
+        for (int i = 0; i < argValues.size(); i++) {
+            deferredArgsEnv.set(argNames.get(i), argValues.get(i));
+        }
+
+        return deferred.eval(deferredArgsEnv);
     }
 
     @Override

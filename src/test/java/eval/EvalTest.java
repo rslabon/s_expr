@@ -73,6 +73,17 @@ class EvalTest {
     }
 
     @Test
+    public void invokeBuildinFunction() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "(define result (+ 1 7))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(8L, actual.get("result"));
+    }
+
+    @Test
     public void manyExpressions() {
         LazyEnv env = new LazyEnv(null);
 
