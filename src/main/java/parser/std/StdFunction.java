@@ -15,5 +15,5 @@ public abstract class StdFunction {
         this.args = args;
     }
 
-    public abstract Object invoke(Env env, List<Expression> expressions);
+    public abstract Object invoke(Env env, List<Expression> argValues);
 }

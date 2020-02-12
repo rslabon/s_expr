@@ -64,7 +64,7 @@ class EvalTest {
         LazyEnv env = new LazyEnv(null);
 
         String code = "" +
-                "(define self (lambda(x) x))\n"+
+                "(define self (lambda(x) x))\n" +
                 "(define result (self 23))";
 
         Env actual = new Eval().eval(code, env);
@@ -81,6 +81,30 @@ class EvalTest {
         Env actual = new Eval().eval(code, env);
 
         assertEquals(8L, actual.get("result"));
+    }
+
+    @Test
+    public void invokeBuildinFunctionNested() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "(define result (+ 1 (+ 2 3)))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(6L, actual.get("result"));
+    }
+
+    @Test
+    public void invokeBuildinFunctionWithReference() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "" +
+                "(define a 3)\n" +
+                "(define result (+ 1 a))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(4L, actual.get("result"));
     }
 
     @Test
