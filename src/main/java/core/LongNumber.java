@@ -11,6 +11,14 @@ public class LongNumber extends Expression {
     public LongNumber(long v) {
         value = v;
         functions.put("+", this::add);
+
+        typeTransformers.put(LongNumber.class, () -> this);
+        typeTransformers.put(DoubleNumber.class, () ->
+                new DoubleNumber(getValue().doubleValue())
+        );
+        typeTransformers.put(Quote.class, () ->
+                new Quote(getValue().toString())
+        );
     }
 
     @Override
@@ -46,16 +54,8 @@ public class LongNumber extends Expression {
     private Expression add(Env env, List<Expression> argValues) {
         long sum = 0;
         for (Expression argValue : argValues) {
-            Expression evalArgValue = argValue.eval(env);
-            if (evalArgValue instanceof LongNumber) {
-                sum += ((LongNumber) evalArgValue).getValue();
-            }
-            if (evalArgValue instanceof DoubleNumber) {
-                sum += ((DoubleNumber) evalArgValue).getValue().longValue();
-            }
-            if (evalArgValue instanceof Quote) {
-                sum += Long.parseLong(((Quote) evalArgValue).getValue());
-            }
+            LongNumber asLong = argValue.eval(env).cast(LongNumber.class);
+            sum += asLong.getValue();
         }
         return new LongNumber(sum);
     }

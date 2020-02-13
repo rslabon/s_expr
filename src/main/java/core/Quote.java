@@ -10,6 +10,14 @@ public class Quote extends Expression {
     public Quote(String value) {
         this.value = value;
         this.functions.put("+", this::add);
+
+        typeTransformers.put(Quote.class, () -> this);
+        typeTransformers.put(LongNumber.class, () ->
+                new LongNumber(Long.parseLong(getValue()))
+        );
+        typeTransformers.put(DoubleNumber.class, () ->
+                new DoubleNumber(Double.parseDouble(getValue()))
+        );
     }
 
     @Override
@@ -43,19 +51,11 @@ public class Quote extends Expression {
     }
 
     private Expression add(Env env, List<Expression> argValues) {
-        String sum = "";
+        StringBuilder sum = new StringBuilder();
         for (Expression argValue : argValues) {
-            Expression evalArgValue = argValue.eval(env);
-            if (evalArgValue instanceof LongNumber) {
-                sum += "" + ((LongNumber) evalArgValue).getValue();
-            }
-            if (evalArgValue instanceof DoubleNumber) {
-                sum += "" + (((DoubleNumber) evalArgValue)).getValue();
-            }
-            if (evalArgValue instanceof Quote) {
-                sum += ((Quote) evalArgValue).getValue();
-            }
+            Quote asQuote = argValue.eval(env).cast(Quote.class);
+            sum.append(asQuote.getValue());
         }
-        return new Quote(sum);
+        return new Quote(sum.toString());
     }
 }

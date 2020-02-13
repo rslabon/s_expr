@@ -9,7 +9,8 @@ import java.util.Map;
 
 public abstract class Expression {
 
-    public final Map<String, Function> functions = new HashMap<>();
+    final Map<String, Function> functions = new HashMap<>();
+    final Map<Class<? extends Expression>, TypeTransformer> typeTransformers = new HashMap<>();
 
     public Expression eval() {
         return eval(null);
@@ -45,5 +46,17 @@ public abstract class Expression {
     public Expression apply(Env env, Expression... argValues) {
         return apply(null, env, Arrays.asList(argValues));
     }
+
+    public <T extends Expression> T cast(Class<? extends Expression> dest) {
+        TypeTransformer typeTransformer = typeTransformers.get(dest);
+        if (typeTransformer == null) {
+            throw new IllegalArgumentException("Cannot cast: " + getClass() + " to " + dest);
+        }
+        return (T) typeTransformer.transform();
+    }
+}
+
+interface TypeTransformer {
+    Expression transform();
 }
 

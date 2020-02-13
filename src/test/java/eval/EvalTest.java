@@ -1,11 +1,9 @@
 package eval;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import core.Deferred;
 import core.LongNumber;
-
-import java.util.Arrays;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -90,23 +88,23 @@ class EvalTest {
     }
 
     @Test
-    public void lazyChain() {
+    public void nestedFunctionCalls() {
         LazyEnv env = new LazyEnv(null);
 
-        String code = ""+
+        String code = "" +
                 "(define inc (lambda(x) (+ x 1)))\n" +
-                "(define result (inc (inc (inc 1))))";
+                "(define result (+ 6 (inc (inc (inc 1)))))";
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(4L, actual.get("result").getValue());
+        assertEquals(10L, actual.get("result").getValue());
     }
 
     @Test
     public void scopes() {
         LazyEnv env = new LazyEnv(null);
 
-        String code = ""+
+        String code = "" +
                 "(define x 2)\n" +
                 "(define square (lambda(x) (+ x x)))\n" +
                 "(define inc (lambda(x) (+ x 1)))\n" +
@@ -142,7 +140,7 @@ class EvalTest {
     }
 
     @Test
-    public void invokeBuildinFunctionNested() {
+    public void invokeBuildInFunctionNested() {
         LazyEnv env = new LazyEnv(null);
 
         String code = "(define result (+ 1 (+ 2 3)))";
@@ -153,25 +151,12 @@ class EvalTest {
     }
 
     @Test
-    public void invokeBuildinFunctionWithReference() {
+    public void invokeBuildInFunctionWithReference() {
         LazyEnv env = new LazyEnv(null);
 
         String code = "" +
                 "(define a 3)\n" +
                 "(define result (+ 1 a))";
-
-        Env actual = new Eval().eval(code, env);
-
-        assertEquals(4L, actual.get("result").getValue());
-    }
-
-    @Test
-    public void invokeBuildinFunctionWithReference2() {
-        LazyEnv env = new LazyEnv(null);
-
-        String code = "" +
-                "(define a 3)\n" +
-                "(define result (+ a 1))";
 
         Env actual = new Eval().eval(code, env);
 

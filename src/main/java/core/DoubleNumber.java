@@ -10,6 +10,14 @@ public class DoubleNumber extends Expression {
     public DoubleNumber(double v) {
         value = v;
         functions.put("+", this::add);
+
+        typeTransformers.put(DoubleNumber.class, () -> this);
+        typeTransformers.put(LongNumber.class, () ->
+                new LongNumber(getValue().longValue())
+        );
+        typeTransformers.put(Quote.class, () ->
+                new Quote(getValue().toString())
+        );
     }
 
     @Override
@@ -46,16 +54,8 @@ public class DoubleNumber extends Expression {
     private Expression add(Env env, List<Expression> argValues) {
         double sum = 0.0;
         for (Expression argValue : argValues) {
-            Expression evalArgValue = argValue.eval(env);
-            if (evalArgValue instanceof LongNumber) {
-                sum += (((LongNumber) evalArgValue).getValue()).doubleValue();
-            }
-            if (evalArgValue instanceof DoubleNumber) {
-                sum += (((DoubleNumber) evalArgValue).getValue());
-            }
-            if (evalArgValue instanceof Quote) {
-                sum += Double.parseDouble(((Quote) evalArgValue).getValue());
-            }
+            DoubleNumber asDouble = argValue.eval(env).cast(DoubleNumber.class);
+            sum += asDouble.getValue();
         }
         return new DoubleNumber(sum);
     }
