@@ -5,6 +5,8 @@ import org.junit.jupiter.api.function.Executable;
 import core.Deferred;
 import core.LongNumber;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class EvalTest {
@@ -29,7 +31,7 @@ class EvalTest {
         LazyEnv env = new LazyEnv(null);
         Env actual = new Eval().eval("(define x 1)", env);
 
-        assertEquals(1L, actual.get("x"));
+        assertEquals(1L, actual.get("x").getValue());
     }
 
     @Test
@@ -39,7 +41,7 @@ class EvalTest {
 
         Env actual = new Eval().eval("(define x y)", env);
 
-        assertEquals(123L, actual.get("x"));
+        assertEquals(123L, actual.get("x").getValue());
     }
 
     @Test
@@ -49,9 +51,7 @@ class EvalTest {
         Env actual = new Eval().eval("(define l (lambda(x) x))", env);
 
         Deferred value = (Deferred) actual.get("l");
-        LazyEnv lambdaEnv = new LazyEnv(null);
-        lambdaEnv.set("x", new LongNumber(999));
-        assertEquals(999L, value.eval(lambdaEnv));
+        assertEquals(999L, value.apply(env, new LongNumber(999)).getValue());
     }
 
     @Test
@@ -59,11 +59,10 @@ class EvalTest {
         LazyEnv env = new LazyEnv(null);
         env.set("y", new LongNumber(54));
 
-        Env actual = new Eval().eval("(define l (lambda(x) y))", env);
+        Env actual = new Eval().eval("(define l (lambda() y))", env);
 
         Deferred value = (Deferred) actual.get("l");
-        LazyEnv lambdaEnv = new LazyEnv(null);
-        assertEquals(54L, value.eval(lambdaEnv));
+        assertEquals(54L, value.apply(env).getValue());
     }
 
     @Test
@@ -76,7 +75,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(23L, actual.get("result"));
+        assertEquals(23L, actual.get("result").getValue());
     }
 
     @Test
@@ -87,7 +86,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(23L, actual.get("result"));
+        assertEquals(23L, actual.get("result").getValue());
     }
 
     @Test
@@ -96,11 +95,26 @@ class EvalTest {
 
         String code = ""+
                 "(define inc (lambda(x) (+ x 1)))\n" +
-                "(define result (inc (inc (inc (inc 1))))";
+                "(define result (inc (inc (inc 1))))";
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(23L, actual.get("result"));
+        assertEquals(4L, actual.get("result").getValue());
+    }
+
+    @Test
+    public void scopes() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = ""+
+                "(define x 2)\n" +
+                "(define square (lambda(x) (+ x x)))\n" +
+                "(define inc (lambda(x) (+ x 1)))\n" +
+                "(define result (inc (square (square (square x)))))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(17L, actual.get("result").getValue());
     }
 
     @Test
@@ -113,7 +127,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(2L, actual.get("result"));
+        assertEquals(2L, actual.get("result").getValue());
     }
 
     @Test
@@ -124,7 +138,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(8L, actual.get("result"));
+        assertEquals(8L, actual.get("result").getValue());
     }
 
     @Test
@@ -135,7 +149,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(6L, actual.get("result"));
+        assertEquals(6L, actual.get("result").getValue());
     }
 
     @Test
@@ -148,7 +162,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(4L, actual.get("result"));
+        assertEquals(4L, actual.get("result").getValue());
     }
 
     @Test
@@ -161,7 +175,7 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(4L, actual.get("result"));
+        assertEquals(4L, actual.get("result").getValue());
     }
 
     @Test
@@ -174,8 +188,8 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(1L, actual.get("a"));
-        assertEquals(2L, actual.get("b"));
+        assertEquals(1L, actual.get("a").getValue());
+        assertEquals(2L, actual.get("b").getValue());
     }
 
     @Test
@@ -188,8 +202,8 @@ class EvalTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(7865L, actual.get("a"));
-        assertEquals(7865L, actual.get("b"));
+        assertEquals(7865L, actual.get("a").getValue());
+        assertEquals(7865L, actual.get("b").getValue());
     }
 
     @Test

@@ -1,8 +1,5 @@
 package eval;
 
-import eval.Env;
-import eval.Eval;
-import eval.LazyEnv;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +14,7 @@ class AddTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(3L, actual.get("result"));
+        assertEquals(3L, actual.get("result").getValue());
     }
 
     @Test
@@ -28,7 +25,7 @@ class AddTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(94L, actual.get("result"));
+        assertEquals(94L, actual.get("result").getValue());
     }
 
     @Test
@@ -39,7 +36,7 @@ class AddTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals("ab", actual.get("result"));
+        assertEquals("ab", actual.get("result").getValue());
     }
 
     @Test
@@ -50,7 +47,7 @@ class AddTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals("a12.5b", actual.get("result"));
+        assertEquals("a12.5b", actual.get("result").getValue());
     }
 
     @Test
@@ -61,7 +58,7 @@ class AddTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(3.6, actual.get("result"));
+        assertEquals(3.6, actual.get("result").getValue());
     }
 
     @Test
@@ -72,6 +69,6 @@ class AddTest {
 
         Env actual = new Eval().eval(code, env);
 
-        assertEquals(6.5, actual.get("result"));
+        assertEquals(6.5, actual.get("result").getValue());
     }
 }

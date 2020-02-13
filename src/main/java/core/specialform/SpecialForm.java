@@ -14,12 +14,12 @@ public abstract class SpecialForm {
         this.arguments = arguments;
     }
 
-    public final Object apply(Env env, List<Expression> parameters) {
+    public final Expression eval(Env env, List<Expression> parameters) {
         if (parameters.size() != arguments) {
             throw new IllegalArgumentException("Function: '" + name + "' error: invalid parameters size! Expected " + arguments + " but got " + parameters.size());
         }
-        return doApply(env, parameters);
+        return doEval(env, parameters);
     }
 
-    abstract Object doApply(Env env, List<Expression> parameters);
+    abstract Expression doEval(Env env, List<Expression> parameters);
 }

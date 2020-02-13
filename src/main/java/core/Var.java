@@ -14,8 +14,13 @@ public class Var extends Expression {
     }
 
     @Override
-    public Object eval(Env env) {
+    public Expression eval(Env env) {
         return env.get(name);
+    }
+
+    @Override
+    public String getValue() {
+        return name;
     }
 
     @Override

@@ -10,7 +10,12 @@ public class Bool extends Expression {
     }
 
     @Override
-    public Object eval(Env env) {
+    public Expression eval(Env env) {
+        return this;
+    }
+
+    @Override
+    public Boolean getValue() {
         return value;
     }
 

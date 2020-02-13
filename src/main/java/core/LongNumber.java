@@ -14,8 +14,13 @@ public class LongNumber extends Expression {
     }
 
     @Override
-    public Object eval(Env env) {
+    public Long getValue() {
         return value;
+    }
+
+    @Override
+    public Expression eval(Env env) {
+        return this;
     }
 
     @Override
@@ -38,20 +43,20 @@ public class LongNumber extends Expression {
         return value + " [l]";
     }
 
-    private Object add(Env env, List<Expression> argValues) {
+    private Expression add(Env env, List<Expression> argValues) {
         long sum = 0;
         for (Expression argValue : argValues) {
-            Object evalArgValue = argValue.eval(env);
-            if (evalArgValue instanceof Long) {
-                sum += (long) evalArgValue;
+            Expression evalArgValue = argValue.eval(env);
+            if (evalArgValue instanceof LongNumber) {
+                sum += ((LongNumber) evalArgValue).getValue();
             }
-            if (evalArgValue instanceof Double) {
-                sum += ((Double) evalArgValue).longValue();
+            if (evalArgValue instanceof DoubleNumber) {
+                sum += ((DoubleNumber) evalArgValue).getValue().longValue();
             }
-            if (evalArgValue instanceof String) {
-                sum += Long.parseLong((String) evalArgValue);
+            if (evalArgValue instanceof Quote) {
+                sum += Long.parseLong(((Quote) evalArgValue).getValue());
             }
         }
-        return sum;
+        return new LongNumber(sum);
     }
 }

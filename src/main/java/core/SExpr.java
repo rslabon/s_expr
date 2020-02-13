@@ -33,7 +33,7 @@ public class SExpr extends Expression {
     }
 
     @Override
-    public Object eval(Env env) {
+    public Expression eval(Env env) {
 
         if (!expressions.isEmpty()) {
             Expression first = expressions.get(0);
@@ -52,13 +52,18 @@ public class SExpr extends Expression {
         return null;
     }
 
-    private Object applyFunctionByName(Var functionName, Env env) {
+    @Override
+    public Object getValue() {
+        return toString();
+    }
+
+    private Expression applyFunctionByName(Var functionName, Env env) {
         String varName = functionName.getName();
         SpecialForm specialForm = SpecialForms.INSTANCE.get(varName.toLowerCase());
         List<Expression> argValues = expressions.subList(1, expressions.size());
 
         if (specialForm != null) {
-            return specialForm.apply(env, argValues);
+            return specialForm.eval(env, argValues);
         } else {
             if (argValues.size() > 0) {
                 Expression thisExpr = argValues.get(0);
@@ -68,11 +73,11 @@ public class SExpr extends Expression {
         }
     }
 
-    private Object applyAnonymousFunction(SExpr lambda, Env env) {
+    private Expression applyAnonymousFunction(SExpr lambda, Env env) {
         List<Expression> lambdaParts = lambda.expressions;
         List<Expression> lambdaDefinition = lambdaParts.subList(1, lambdaParts.size());
         List<Expression> argValues = expressions.subList(1, expressions.size());
-        Deferred deferred = Deferred.from(env, lambdaDefinition);
+        Deferred deferred = Deferred.from(lambdaDefinition);
 
         return deferred.apply(null, env, argValues);
     }

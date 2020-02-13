@@ -15,8 +15,8 @@ public class Lambda extends SpecialForm {
     }
 
     @Override
-    public Object doApply(Env env, List<Expression> parameters) {
-        return Deferred.from(env, parameters);
+    public Expression doEval(Env env, List<Expression> parameters) {
+        return Deferred.from(parameters);
     }
 
     @Override

@@ -7,21 +7,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class LazyEnv implements Env {
-    private Env parent;
-    private final Map<String, Object> mapping = new HashMap<>();
+    private final Map<String, Expression> mapping = new HashMap<>();
 
-    public LazyEnv(Env parent) {
-        this.parent = parent;
+    public LazyEnv(LazyEnv parent) {
+        if (parent != null) {
+            this.mapping.putAll(parent.mapping);
+        }
     }
 
     @Override
-    public Env chain(Env context) {
-        return new LazyEnv(this) {
-            @Override
-            public Object get(String name) {
-                return super.contains(name) ? super.get(name) : context.get(name);
-            }
-        };
+    public Env overrideWith(Env context) {
+        LazyEnv chainEnv = new LazyEnv(null);
+        chainEnv.mapping.putAll(this.mapping);
+        chainEnv.mapping.putAll(((LazyEnv) context).mapping);
+        return chainEnv;
     }
 
     @Override
@@ -30,26 +29,21 @@ public class LazyEnv implements Env {
     }
 
     @Override
-    public Object get(String name) {
-        Object value = mapping.get(name);
-        if (value != null && value instanceof Expression) {
-            Object materalizedValue = ((Expression) value).eval(this);
+    public Expression get(String name) {
+        Expression value = mapping.get(name);
+        if (value != null) {
+            Expression materalizedValue = value.eval(this);
             mapping.put(name, materalizedValue);
-        }
-        Object actualValue = mapping.get(name);
-        if (actualValue != null) {
-            return actualValue;
-        }
-        if (parent != null) {
-            return parent.get(name);
+            if (materalizedValue != null) {
+                return materalizedValue;
+            }
         }
         throw new IllegalArgumentException("Unbound variable: " + name);
     }
 
     @Override
     public boolean contains(String name) {
-        Object value = mapping.get(name);
-        return value != null || parent != null && parent.contains(name);
+        return mapping.containsKey(name);
     }
 
     @Override
@@ -64,8 +58,6 @@ public class LazyEnv implements Env {
                 .stream()
                 .map(e -> String.format("%-10s = %s", e.getKey(), e.getValue()))
                 .collect(Collectors.joining("\n"));
-        s += "\n\n** Parent **\n";
-        s += parent;
         return s;
     }
 }

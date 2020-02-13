@@ -13,8 +13,13 @@ public class DoubleNumber extends Expression {
     }
 
     @Override
-    public Object eval(Env env) {
+    public Double getValue() {
         return value;
+    }
+
+    @Override
+    public Expression eval(Env env) {
+        return this;
     }
 
     @Override
@@ -38,20 +43,20 @@ public class DoubleNumber extends Expression {
         return value + " [d]";
     }
 
-    private Object add(Env env, List<Expression> argValues) {
+    private Expression add(Env env, List<Expression> argValues) {
         double sum = 0.0;
         for (Expression argValue : argValues) {
-            Object evalArgValue = argValue.eval(env);
-            if (evalArgValue instanceof Long) {
-                sum += ((Long) evalArgValue).doubleValue();
+            Expression evalArgValue = argValue.eval(env);
+            if (evalArgValue instanceof LongNumber) {
+                sum += (((LongNumber) evalArgValue).getValue()).doubleValue();
             }
-            if (evalArgValue instanceof Double) {
-                sum += ((double) evalArgValue);
+            if (evalArgValue instanceof DoubleNumber) {
+                sum += (((DoubleNumber) evalArgValue).getValue());
             }
-            if (evalArgValue instanceof String) {
-                sum += Double.parseDouble((String) evalArgValue);
+            if (evalArgValue instanceof Quote) {
+                sum += Double.parseDouble(((Quote) evalArgValue).getValue());
             }
         }
-        return sum;
+        return new DoubleNumber(sum);
     }
 }

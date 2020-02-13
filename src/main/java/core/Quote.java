@@ -13,10 +13,11 @@ public class Quote extends Expression {
     }
 
     @Override
-    public Object eval(Env env) {
-        return value;
+    public Expression eval(Env env) {
+        return this;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
@@ -41,20 +42,20 @@ public class Quote extends Expression {
         return value + " [q]";
     }
 
-    private Object add(Env env, List<Expression> argValues) {
+    private Expression add(Env env, List<Expression> argValues) {
         String sum = "";
         for (Expression argValue : argValues) {
-            Object evalArgValue = argValue.eval(env);
-            if (evalArgValue instanceof Long) {
-                sum += "" + (long) evalArgValue;
+            Expression evalArgValue = argValue.eval(env);
+            if (evalArgValue instanceof LongNumber) {
+                sum += "" + ((LongNumber) evalArgValue).getValue();
             }
-            if (evalArgValue instanceof Double) {
-                sum += "" + ((double) evalArgValue);
+            if (evalArgValue instanceof DoubleNumber) {
+                sum += "" + (((DoubleNumber) evalArgValue)).getValue();
             }
-            if (evalArgValue instanceof String) {
-                sum += (String) evalArgValue;
+            if (evalArgValue instanceof Quote) {
+                sum += ((Quote) evalArgValue).getValue();
             }
         }
-        return sum;
+        return new Quote(sum);
     }
 }
