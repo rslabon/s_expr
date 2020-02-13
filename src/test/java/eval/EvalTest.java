@@ -2,12 +2,19 @@ package eval;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import parser.Deferred;
-import parser.LongNumber;
+import core.Deferred;
+import core.LongNumber;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class EvalTest {
+
+    //TODO collections
+    //TODO special form: IF
+    //TODO loop
+    //TODO custom classes
+    //TODO packages and imports
+    //TODO iteropt with java
 
     @Test
     public void empty() {
@@ -73,6 +80,43 @@ class EvalTest {
     }
 
     @Test
+    public void invokeLambdaNow() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "(define result ((lambda(x) x) 23)";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(23L, actual.get("result"));
+    }
+
+    @Test
+    public void lazyChain() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = ""+
+                "(define inc (lambda(x) (+ x 1)))\n" +
+                "(define result (inc (inc (inc (inc 1))))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(23L, actual.get("result"));
+    }
+
+    @Test
+    public void redefine() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "" +
+                "(define + (lambda(a b) b))\n" +
+                "(define result (+ 1 2))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(2L, actual.get("result"));
+    }
+
+    @Test
     public void invokeBuildinFunction() {
         LazyEnv env = new LazyEnv(null);
 
@@ -101,6 +145,19 @@ class EvalTest {
         String code = "" +
                 "(define a 3)\n" +
                 "(define result (+ 1 a))";
+
+        Env actual = new Eval().eval(code, env);
+
+        assertEquals(4L, actual.get("result"));
+    }
+
+    @Test
+    public void invokeBuildinFunctionWithReference2() {
+        LazyEnv env = new LazyEnv(null);
+
+        String code = "" +
+                "(define a 3)\n" +
+                "(define result (+ a 1))";
 
         Env actual = new Eval().eval(code, env);
 

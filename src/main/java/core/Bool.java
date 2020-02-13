@@ -1,4 +1,4 @@
-package parser;
+package core;
 
 import eval.Env;
 
@@ -31,8 +31,6 @@ public class Bool extends Expression {
 
     @Override
     public String toString() {
-        return "parser.Bool{" +
-                "value=" + value +
-                '}';
+        return value + " [b]";
     }
 }

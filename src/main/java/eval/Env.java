@@ -1,11 +1,13 @@
 package eval;
 
-import parser.Expression;
+import core.Expression;
 
 public interface Env {
     boolean isEmpty();
 
     Object get(String name);
+
+    boolean contains(String name);
 
     void set(String varName, Expression value);
 

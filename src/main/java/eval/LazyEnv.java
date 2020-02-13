@@ -1,9 +1,10 @@
 package eval;
 
-import parser.Expression;
+import core.Expression;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LazyEnv implements Env {
     private Env parent;
@@ -18,11 +19,7 @@ public class LazyEnv implements Env {
         return new LazyEnv(this) {
             @Override
             public Object get(String name) {
-                try {
-                    return super.get(name);
-                } catch (IllegalArgumentException e) {
-                    return context.get(name);
-                }
+                return super.contains(name) ? super.get(name) : context.get(name);
             }
         };
     }
@@ -50,7 +47,25 @@ public class LazyEnv implements Env {
     }
 
     @Override
+    public boolean contains(String name) {
+        Object value = mapping.get(name);
+        return value != null || parent != null && parent.contains(name);
+    }
+
+    @Override
     public void set(String varName, Expression value) {
         mapping.put(varName, value);
+    }
+
+    @Override
+    public String toString() {
+        String s = "*** " + super.toString() + " ***\n";
+        s += mapping.entrySet()
+                .stream()
+                .map(e -> String.format("%-10s = %s", e.getKey(), e.getValue()))
+                .collect(Collectors.joining("\n"));
+        s += "\n\n** Parent **\n";
+        s += parent;
+        return s;
     }
 }

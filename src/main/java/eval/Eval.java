@@ -1,7 +1,7 @@
 package eval;
 
 import parser.DefaultParser;
-import parser.Expression;
+import core.Expression;
 import parser.MutliExpressionParser;
 
 import java.util.List;

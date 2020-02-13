@@ -1,24 +1,24 @@
-package parser;
+package core;
 
 import eval.Env;
 
 import java.util.List;
 
 public class Quote extends Expression {
-    private final String text;
+    private final String value;
 
-    public Quote(String text) {
-        this.text = text;
+    public Quote(String value) {
+        this.value = value;
         this.functions.put("+", this::add);
     }
 
     @Override
     public Object eval(Env env) {
-        return text;
+        return value;
     }
 
-    public String getText() {
-        return text;
+    public String getValue() {
+        return value;
     }
 
     @Override
@@ -28,19 +28,17 @@ public class Quote extends Expression {
 
         Quote quote = (Quote) o;
 
-        return text != null ? text.equals(quote.text) : quote.text == null;
+        return value != null ? value.equals(quote.value) : quote.value == null;
     }
 
     @Override
     public int hashCode() {
-        return text != null ? text.hashCode() : 0;
+        return value != null ? value.hashCode() : 0;
     }
 
     @Override
     public String toString() {
-        return "parser.Quote{" +
-                "text='" + text + '\'' +
-                '}';
+        return value + " [q]";
     }
 
     private Object add(Env env, List<Expression> argValues) {

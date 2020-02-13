@@ -1,9 +1,9 @@
-package parser;
+package core;
 
 import eval.Env;
 
 import java.util.List;
 
 public interface Function {
-    Object invoke(Env env, List<Expression> argValues);
+    Object apply(Env env, List<Expression> argValues);
 } 

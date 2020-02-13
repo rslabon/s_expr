@@ -1,10 +1,9 @@
-package parser;
+package core;
 
 import eval.Env;
 
 public class Var extends Expression {
     private final String name;
-
 
     public Var(String name) {
         this.name = name;
@@ -36,8 +35,6 @@ public class Var extends Expression {
 
     @Override
     public String toString() {
-        return "parser.Var{" +
-                "name='" + name + '\'' +
-                '}';
+        return name + " [v]";
     }
 }

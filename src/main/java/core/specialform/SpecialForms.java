@@ -1,4 +1,4 @@
-package parser.specialform;
+package core.specialform;
 
 import java.util.HashMap;
 import java.util.Map;

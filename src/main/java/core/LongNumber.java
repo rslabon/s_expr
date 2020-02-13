@@ -1,13 +1,14 @@
-package parser;
+package core;
 
 import eval.Env;
 
 import java.util.List;
 
-public class DoubleNumber extends Expression {
-    private final double value;
+public class LongNumber extends Expression {
 
-    public DoubleNumber(double v) {
+    private final long value;
+
+    public LongNumber(long v) {
         value = v;
         functions.put("+", this::add);
     }
@@ -22,36 +23,33 @@ public class DoubleNumber extends Expression {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        DoubleNumber that = (DoubleNumber) o;
+        LongNumber that = (LongNumber) o;
 
-        return Double.compare(that.value, value) == 0;
+        return value == that.value;
     }
 
     @Override
     public int hashCode() {
-        long temp = Double.doubleToLongBits(value);
-        return (int) (temp ^ (temp >>> 32));
+        return (int) (value ^ (value >>> 32));
     }
 
     @Override
     public String toString() {
-        return "parser.DoubleNumber{" +
-                "value=" + value +
-                '}';
+        return value + " [l]";
     }
 
     private Object add(Env env, List<Expression> argValues) {
-        double sum = 0.0;
+        long sum = 0;
         for (Expression argValue : argValues) {
             Object evalArgValue = argValue.eval(env);
             if (evalArgValue instanceof Long) {
-                sum += ((Long) evalArgValue).doubleValue();
+                sum += (long) evalArgValue;
             }
             if (evalArgValue instanceof Double) {
-                sum += ((double) evalArgValue);
+                sum += ((Double) evalArgValue).longValue();
             }
             if (evalArgValue instanceof String) {
-                sum += Double.parseDouble((String) evalArgValue);
+                sum += Long.parseLong((String) evalArgValue);
             }
         }
         return sum;
